@@ -1,12 +1,10 @@
 import express from "express";
 import db from "../utils/connect-sql.js";
+import bcrypt from "bcrypt";
 import { z } from "zod";
 
 const router = express.Router();
 
-// 接收註冊資料
-
-// 註冊資料驗證物件
 const userSchema = z.object({
   name: z
     .string()
@@ -31,6 +29,7 @@ const userSchema = z.object({
 });
 
 router.post("/", async (req, res) => {
+  // 接收註冊資料
   const { name, email, mobile, password } = req.body;
 
   const validateResult = userSchema.safeParse({
@@ -46,35 +45,36 @@ router.post("/", async (req, res) => {
     const { name, email, mobile, password } = validateResult.data;
 
     // 檢查email是否已經被註冊
-    const existingEmail = await db.query(
-      "SELECT * FROM users WHERE email = ?",
+    // email欄位設定唯一值，
+    const [emailRows] = await db.query(
+      "SELECT * FROM valid_users WHERE email = ?",
       [email]
     );
-    if (existingEmail.length > 0) {
+    if (emailRows.length > 0) {
       return res.status(400).json({
         message: "註冊失敗",
         error: "此電子郵件已被註冊",
       });
     }
 
-    // 檢查手機號碼是否已經被註冊
-    const existingMobile = await db.query(
-      "SELECT * FROM users WHERE mobile = ?",
+    // 檢查手機號碼是否已經被註冊;
+    const [mobileRows] = await db.query(
+      "SELECT * FROM valid_users WHERE mobile = ?",
       [mobile]
     );
-    if (existingMobile.length > 0) {
+    if (mobileRows.length > 0) {
       return res.status(400).json({
         message: "註冊失敗",
         error: "此手機號碼已被註冊",
       });
     }
 
-    // 加密密碼
+    加密密碼;
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 將註冊資料插入資料庫 (考慮使用uuid，目前用auto_increment)
     const newUser = await db.query(
-      "INSERT INTO users (name, email, mobile, password) VALUES (?, ?, ?, ?)",
+      "INSERT INTO valid_users (name, email, mobile, password) VALUES (?, ?, ?, ?)",
       [name, email, mobile, hashedPassword]
     );
 

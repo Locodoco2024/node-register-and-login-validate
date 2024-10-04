@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon --env-file=dev.env index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "type": "module",
@@ -15,6 +16,7 @@
     "express": "^4.21.0",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.11.3",
+    "nodemon": "^3.1.7",
     "uuid": "^10.0.0",
     "zod": "^3.23.8"
   }
