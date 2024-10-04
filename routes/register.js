@@ -10,13 +10,17 @@ const router = express.Router();
 const userSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(2, { message: "名字至少需要 2 個字" })
     .max(50, { message: "名字不能超過 50 個字" }),
-  email: z.string().email({ message: "請輸入有效的電子郵件地址" }),
+  email: z
+    .string()
+    .email({ message: "請輸入有效的電子郵件地址" })
+    .toLowerCase(),
   mobile: z
     .string()
-    .min(10, { message: "手機號碼至少需要 10 個字" })
-    .max(10, { message: "手機號碼不能超過 10 個字" }),
+    .trim()
+    .regex(/^09\d{8}$/, { message: "請輸入有效的台灣手機號碼" }),
   password: z
     .string()
     .min(8, { message: "密碼至少需要 8 個字" })
@@ -42,10 +46,11 @@ router.post("/", async (req, res) => {
     const { name, email, mobile, password } = validateResult.data;
 
     // 檢查email是否已經被註冊
-    const existingUser = await db.query("SELECT * FROM users WHERE email = ?", [
-      email,
-    ]);
-    if (existingUser.length > 0) {
+    const existingEmail = await db.query(
+      "SELECT * FROM users WHERE email = ?",
+      [email]
+    );
+    if (existingEmail.length > 0) {
       return res.status(400).json({
         message: "註冊失敗",
         error: "此電子郵件已被註冊",
