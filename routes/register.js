@@ -69,7 +69,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    加密密碼;
+    // 加密密碼
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // 將註冊資料插入資料庫 (考慮使用uuid，目前用auto_increment)
